@@ -1,13 +1,68 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.body {
+  font-family: sans-serif;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.has-text-danger{
+  color: orangered;
+}
+.invoice-form {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.invoice-form h1 {
+  text-align: center;
+}
+
+.invoice-form .form-group {
+  margin-bottom: 15px;
+  display: flex;
+  
+}
+
+.invoice-form .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.invoice-form .form-group input,
+.invoice-form .form-group textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 2px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.invoice-form .item-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.invoice-form .item-group input {
+  flex: 1;
+}
+
+.invoice-form .form-totals {
+  text-align: right;
+}
+
+.invoice-form button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.invoice-form button:hover {
+  background: #0056b3;
 }
