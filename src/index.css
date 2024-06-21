@@ -1,12 +1,12 @@
-.body {
-  font-family: sans-serif;
+body {
+  font-family: 'Roboto', sans-serif;
 }
 
 .has-text-danger{
   color: orangered;
 }
 .invoice-form {
-  max-width: 800px;
+  max-width: 950px;
   margin: auto;
   padding: 20px;
   background: #f9f9f9;
@@ -18,15 +18,13 @@
 }
 
 .invoice-form .form-group {
-  margin-bottom: 15px;
-  display: flex;
-  
+   margin: 15px 0 15px;
 }
 
-.invoice-form .form-group label {
-  display: block;
+ label {
   margin-bottom: 5px;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .invoice-form .form-group input,
@@ -38,31 +36,50 @@
   border-radius: 4px;
 }
 
-.invoice-form .item-group {
+.form-body {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 2rem;
 }
 
-.invoice-form .item-group input {
-  flex: 1;
-}
-
-.invoice-form .form-totals {
-  text-align: right;
+.form-totals {
+  justify-content: center;
+  display: flex;
 }
 
 .invoice-form button {
   display: block;
-  width: 100%;
   padding: 10px;
   background: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 20px;
   cursor: pointer;
 }
 
 .invoice-form button:hover {
   background: #0056b3;
+}
+
+.invoice-form .remove-button {
+  background-color: orangered;
+  font-size: 8px;
+  height: 1px;
+  width: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invoice-form .remove-button:hover {
+  background: rgb(238, 65, 2);
+}
+
+.help {
+ display: block;
+ font-size: .75rem;
+ margin-top: .25rem;
+}
+
+.invoice-form .title{
+  margin-bottom: 1rem; 
 }

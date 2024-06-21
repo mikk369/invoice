@@ -32,9 +32,14 @@ app.post('/create-pdf', (req, res) => {
         .text('10137 Viljandi', 300, 145)
         .text('www.webcodes.ee', 300, 160)
         .text('info@webcodes.ee', 300, 175)
-        .text('Reg. nr.: 12345678', 300, 190)
-        .text('KMKR: EE123456789', 300, 205)
-        .text('Swedpank: EE470000123421423 EEUGH00200XX', 300, 220);
+        .text(`Reg. nr. :  ${data.regNumber}`, 300, 190)
+
+        if(data.vatNumber) {
+            doc.text('KMKR: EE123456789', 300, 205)
+        }
+
+        const yCordinatesSwed = data.vatNumber ? 220 : 205;
+        doc.text('Swedpank: EE470000123421423 EEUGH00200XX', 300, yCordinatesSwed);
 
     // Add invoice title and metadata
     doc.fontSize(14)
@@ -43,8 +48,13 @@ app.post('/create-pdf', (req, res) => {
         .text(`Arve number: ${data.invoiceNumber}`, 50, 280)
         .text(`Viitenumber: ${data.referenceNumber}`, 50, 295)
         .text(`Arve kuupäev: ${data.invoiceDate}`, 50, 310)
-        .text(`Kättetoimetamise viis: ${data.deliveryMethod}`, 50, 325)
-        .text(`Tasuda: ${data.totalAmount} €`, 50, 340);
+
+        if(data.deliveryMethod) {
+            doc.text(`Kättetoimetamise viis: ${data.deliveryMethod}`, 50, 325)
+        }
+
+        const yCodinatesDeliveryMethod = data.deliveryMethod ? 50 : 325;
+        doc.text(`Tasuda: ${data.totalAmount} €`, 50, yCodinatesDeliveryMethod);
 
     // Add services table header
     doc.text('Nr. Toode/teenus   Ühiku hind €  Kogus  KM %  Kokku €', 50, 380);
