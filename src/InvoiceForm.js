@@ -13,7 +13,7 @@ const InvoiceForm = () => {
         issuer: 'WebCodes OÜ',
         regNumber: '16809459',
         vatNumber: '',
-        issuerContact: 'Lossi plats 1a, 10137 Tallinn, www.ettevote.ee, info@ettevote.ee',
+        issuerContact: 'Address, company name, company email',
         receiverAddress: '',
         additionalInfo: 'Tasumisel palume maksekorraldusele kindlasti märkida viitenumber',
         items: [{ description: '', unitPrice: 0, quantity: 0, vat: 0 }],
@@ -27,36 +27,73 @@ const InvoiceForm = () => {
         setFormData({ ...formData, [name]: value });
     };
 
+    const calculateTotals = (items) => {
+
+        let totalExclVat = 0;
+        let totalVat = 0;
+
+        items.forEach(item => {
+            const itemTotalExclVat = item.unitPrice * item.quantity;
+            const itemVat = (item.unitPrice * item.quantity * item.vat) / 100;
+            totalExclVat += itemTotalExclVat;
+            totalVat += itemVat;
+        });
+
+        const totalInclVat = totalExclVat + totalVat;
+
+        return { 
+            totalExclVat: totalExclVat.toFixed(2),
+            totalVat: totalVat.toFixed(2),
+            totalInclVat: totalInclVat.toFixed(2)
+        }
+    }
+
     const handleItemChange = (index, e) => {
         const { name, value } = e.target;
         const items = [...formData.items];
         items[index][name] = value;
-        setFormData({ ...formData, items });
+
+        const totals = calculateTotals(items);
+
+        setFormData({ ...formData, items, ...totals });
     };
 
     const removeItem = (index) => {
         const updatedItems = [...formData.items];
         updatedItems.splice(index, 1);
-        setFormData({ ...formData, items: updatedItems });
+
+        const { totalExclVat, totalVat, totalInclVat} = calculateTotals(updatedItems);
+
+        setFormData(prevState => ({
+        ...prevState,
+        items: updatedItems,
+        totalExclVat,
+        totalVat,
+        totalInclVat
+    }));
     };
 
     const addItem = () => {
-        setFormData({ ...formData, items: [...formData.items, { description: '', unitPrice: 0, quantity: 0, vat: 22 }] });
+        const newItem = { description: '', unitPrice: 0, quantity: 0, vat: 0};
+        const updatedItems = [...formData.items, newItem];
+        
+        setFormData({ ...formData, items: updatedItems });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Perform calculation for totals here
+
+        const updatedFormData = { ...formData, ...calculateTotals(formData.items)}
     
         try {
-            const response = await axios.post('http://localhost:3003/create-pdf', formData, {
+            const response = await axios.post('http://localhost:3003/create-pdf', updatedFormData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
     
             if (response.status === 200) {
-                window.open('http://localhost:3003/invoice.pdf');
+                window.open(`http://localhost:3003/server/invoices/invoice${formData.invoiceNumber}.pdf`);
             } else {
                 console.error('Failed to create PDF');
             }
@@ -71,10 +108,8 @@ const InvoiceForm = () => {
             <div className="form-group">
                 <div className='form-body'>
                     <div className='form'>
-                        <label>Arve number
-                            <span className='has-text-danger'>*</span>
-                        </label>
-                        <input type="text" name="invoiceNumber" placeholder='120123456789' value={formData.invoiceNumber} onChange={handleInputChange} required />
+                        <label>Arve number</label>
+                        <input type="text" name="invoiceNumber" placeholder='120123456789' value={formData.invoiceNumber} onChange={handleInputChange} />
                     </div>
                     <div className='form'>
                         <label>Viitenumber</label>
@@ -173,7 +208,7 @@ const InvoiceForm = () => {
                             </div>
                             <div className='form'>
                             <label>Summa</label> 
-                                <input type="number" name="totalInclVat" placeholder="KM %" value={formData.totalInclVat} onChange={(e) => handleItemChange(index, e)}  readOnly/>
+                                <input type="number" name="totalInclVat" placeholder="KM %" value={(item.unitPrice * item.quantity * (1 + item.vat / 100)).toFixed(2)}  readOnly/>
                                 <p  className='help'>Hind km-ga</p>
                             </div>
                             <button type="button" className='remove-button' onClick={() => removeItem(index)}>X</button>
