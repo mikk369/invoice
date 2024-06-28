@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'build')));
+app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 
 const invoiceDir = path.join(__dirname, 'invoices');
 const counterFile = path.join(invoiceDir, 'counter.txt');
@@ -55,11 +56,10 @@ app.post('/create-pdf', (req, res) => {
     
     // Add header
     doc.fontSize(12)
+        .font('Helvetica-Bold') 
         .text('Arve saaja:', 50, 100)
-        .text('Paras Pähkel', 50, 115)
-        .text('Address', 50, 130)
-        .text('City', 50, 145)
-
+        .font('Helvetica') 
+        .text(`${data.receiverAddress}`, 50, 115)
         .text('Arve esitaja:', 300, 100)
         .text('WebCodes OÜ', 300, 115)
         .text('Address,', 300, 130)
@@ -112,7 +112,7 @@ app.post('/create-pdf', (req, res) => {
 
 
     stream.on('finish', () => {
-        res.sendFile(filePath);
+        res.status(200).json({ filePath: `/invoices/invoice-${invoiceNumber}.pdf` });
     });
 });
 
