@@ -86,14 +86,14 @@ const InvoiceForm = () => {
         const updatedFormData = { ...formData, ...calculateTotals(formData.items)}
     
         try {
-            const response = await axios.post('http://localhost:3003/create-pdf', updatedFormData, {
+            const response = await axios.post('https://invoice.webcodes.ee/create-pdf', updatedFormData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
             if (response.status === 200) {
                 const filePath = response.data.filePath;
-                window.open(`http://localhost:3003${filePath}`);
+                window.open(`https://invoice.webcodes.ee/${filePath}`);
             } else {
                 console.error('Failed to create PDF');
             }
