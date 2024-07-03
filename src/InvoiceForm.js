@@ -13,7 +13,7 @@ const InvoiceForm = () => {
         issuer: 'WebCodes OÜ',
         regNumber: '16809459',
         vatNumber: '',
-        issuerContact: 'Address, company name, company email',
+        issuerContact: 'Aadress, Linn, www.webcodes.ee, info@webcodes.ee',
         receiverAddress: '',
         additionalInfo: 'Tasumisel palume maksekorraldusele kindlasti märkida viitenumber',
         items: [{ description: '', unitPrice: 0, quantity: 0, vat: 0 }],
@@ -86,14 +86,14 @@ const InvoiceForm = () => {
         const updatedFormData = { ...formData, ...calculateTotals(formData.items)}
     
         try {
-            const response = await axios.post('https://invoice.webcodes.ee/create-pdf', updatedFormData, {
+            const response = await axios.post('http://localhost:3003/create-pdf', updatedFormData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
             if (response.status === 200) {
                 const filePath = response.data.filePath;
-                window.open(`https://invoice.webcodes.ee/${filePath}`);
+                window.open(`http://localhost:3003${filePath}`);
             } else {
                 console.error('Failed to create PDF');
             }
@@ -123,7 +123,7 @@ const InvoiceForm = () => {
                         <label>Arve kuupäev
                             <span className='has-text-danger'>*</span>
                         </label>
-                        <input type="date" name="invoiceDate" value={formData.invoiceDate} onChange={handleInputChange} required />
+                        <input type="date" name="invoiceDate" value={formData.invoiceDate} onChange={handleInputChange} required/>
                     </div>
                     <div className='form'>
                         <label>Maksähtäeg</label>

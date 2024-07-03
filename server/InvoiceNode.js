@@ -36,7 +36,6 @@ const incrementCounter = () => {
     return counter;
 }
 
-
 app.post('/create-pdf', (req, res) => {
 
     const invoiceNumber = `${incrementCounter().toString().padStart(6, '0')}`;
@@ -55,58 +54,104 @@ app.post('/create-pdf', (req, res) => {
     doc.pipe(stream);
     
     // Add header
-    doc.fontSize(12)
+    doc.fontSize(14)
         .font('Helvetica-Bold') 
-        .text('Arve saaja:', 50, 100)
+        .text('Arve saaja:', 50, 85)
+        .text('Arve esitaja:', 50, 140)
         .font('Helvetica') 
-        .text(`${data.receiverAddress}`, 50, 115)
-        .text('Arve esitaja:', 300, 100)
-        .text('WebCodes OÜ', 300, 115)
-        .text('Address,', 300, 130)
-        .text('City', 300, 145)
-        .text('www.webcodes.ee', 300, 160)
-        .text('info@webcodes.ee', 300, 175)
-        .text(`Reg. nr. :  ${data.regNumber}`, 300, 190)
+        .fontSize(12)
+        .text(`${data.receiverAddress}`, 50, 100, {width: 300})
+        .text('WebCodes OÜ', 50, 157)
+        .text('Aadress,', 50, 170)
+        .text('Linn', 50, 185)
+        .text('www.webcodes.ee', 50, 200)
+        .text('info@webcodes.ee', 50, 215)
+        .text(`Reg. nr. :  ${data.regNumber}`, 200, 155)
 
         if(data.vatNumber) {
-            doc.text('KMKR: EE123456789', 300, 205)
+            doc.text('KMKR: EE123456789', 200, 170)
         }
 
-        const yCordinatesSwed = data.vatNumber ? 220 : 205;
-        doc.text('Swedpank: IBAN: EE742200221087412500 SWIFT/BIC: HABAEE2X', 300, yCordinatesSwed);
+        doc.fontSize(12)
+        .font('Helvetica-Bold')
+        .text('Swedpank: ', 50, 245)
+        .font('Helvetica')
+        .fontSize(12)
+        .text('IBAN: EE742200221087412500 SWIFT/BIC: HABAEE2X', 120, 245)
+        .moveTo(50, 270)
+        .lineTo(540, 270) 
+        .strokeColor('green') 
+        .stroke()
 
+        
     // Add invoice title and metadata
     doc.fontSize(14)
         .font('Helvetica-Bold') 
-        .text('Arve', 50, 260)
+        .text('Arve nr', 390, 85)
+        .text(`${data.invoiceNumber}`, 490, 85)
         .fontSize(12)
-        .font('Helvetica') 
-        .text(`Arve number: ${data.invoiceNumber}`, 50, 280)
-        .text(`Viitenumber: ${data.referenceNumber}`, 50, 295)
-        .text(`Arve kuupäev: ${data.invoiceDate}`, 50, 310)
-
-        if(data.deliveryMethod) {
-            doc.text(`Kättetoimetamise viis: ${data.deliveryMethod}`, 50, 325)
-        }
-
-        const yCodinatesDeliveryMethod = data.deliveryMethod ? 50 : 325;
-        doc.text(`Tasuda: ${data.totalInclVat} €`, 50, yCodinatesDeliveryMethod);
+        .font('Helvetica')
+        .moveTo(390, 100)
+        .lineTo(540, 100) 
+        .strokeColor('green') 
+        .stroke()
+        .text(`Arve kuupäev: ${data.invoiceDate}`, 390, 110)
+        .text(`Viitenumber: ${data.referenceNumber}`, 390, 125)
+        .moveTo(390, 145)
+        .lineTo(540, 145) 
+        .strokeColor('green') 
+        .stroke()
 
     // Add services table header
-    doc.text('Nr. Toode/teenus   Ühiku hind €  Kogus  KM %  Kokku €', 50, 380);
+    doc.font('Helvetica-Bold')
+        .text('Nr.', 50, 285)
+        .text('Toode/teenus', 75, 285)
+        .text('Ühiku hind €', 290, 285)
+        .text('Kogus', 390, 285 )
+        .text('KM %', 440, 285)
+        .text('Kokku', 480, 285 )
+        .font('Helvetica')
 
-    // Add service row
-    data.items.forEach((item, index) => {
-        doc.text(`Nimi ${index + 1}: ${item.description}, Hind: ${item.unitPrice}, Kogus: ${item.quantity}, Käibemaks: ${item.vat + '%'}`);
-    });
+            let startY = 310; // Initial Y-coordinate for the first row
+            const rowHeight = 20; // Height between rows
+        
+            data.items.forEach((item, index) => {
+                const y = startY + (index * rowHeight);
+
+                if(index % 2 === 0) {
+                    doc.fillColor(25, 255, 255)
+                } else {
+                    doc.fillColor(211, 211, 211);
+                }
+
+
+                doc.text(`${index + 1}`, 50, y)
+                    .text(`${item.description}`, 75, y)
+                    .text(`${item.unitPrice} €`, 290, y)
+                    .text(`${item.quantity}`, 405, y)
+                    .text(`${item.vat}`, 445, y)
+                    .text(`${item.unitPrice * item.quantity} €`, 480, y)
+            });
+
+            const finalY = startY + (data.items.length * rowHeight) + 5; // Adjust Y-coordinate slightly
+                doc.moveTo(50, finalY)
+                .lineTo(540, finalY)
+                .strokeColor('green')
+                .stroke();
+               
+            // Add totals dynamically below the grey line
+            const totalsStartY = finalY + 15; // Adding some space between the line and the totals    
 
     // Add totals
-    doc.text(`Arve kokku: Summa km-ta € ${data.totalExclVat}`, 50, 440)
-        .text(`KM kokku € ${data.totalVat}`, 50, 455)
-        .text(`Arve summa € ${data.totalInclVat}`, 50, 470);
-
+    doc.font('Helvetica-Bold')
+        .text(`Summa km-ta € ${data.totalExclVat}`, 400, totalsStartY)
+        .text(`KM kokku € ${data.totalVat}`, 400, totalsStartY + 15)
+        .text(`Arve summa € ${data.totalInclVat}`, 400, totalsStartY + 30)
+        .font('Helvetica')
+        
+        const paymentNoteY = totalsStartY + 80;
     // Add payment note
-    doc.text(`Tasumisel palume maksekorraldusele kindlasti märkida viitenumber`, 50, 510);
+    doc.text(`Tasumisel palume maksekorraldusele kindlasti märkida viitenumber`, 50, paymentNoteY);
 
     doc.end();
 
